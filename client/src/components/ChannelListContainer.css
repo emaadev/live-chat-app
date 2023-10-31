@@ -1,0 +1,6 @@
+.str-chat__channel-list {
+  display: flex;
+  width: 100%;
+  padding: 20px 15px;
+  background-color: transparent !important;
+}
