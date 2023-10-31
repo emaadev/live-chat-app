@@ -1,13 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useChatContext } from "stream-chat-react";
+import { ResultsDropdown } from "./";
+
 import { BsSearch } from "react-icons/bs";
 
 const ChannelSearch = () => {
+  const { client, setActiveChannel } = useChatContext();
   const [query, setQuery] = useState("");
-  const [load, setLoad] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [teamChannels, setTeamChannels] = useState([]);
+  const [directChannels, setDirectChannels] = useState([]);
+
+  useEffect(() => {
+    if (!query) {
+      setTeamChannels([]);
+      setDirectChannels([]);
+    }
+  }, [query]);
 
   const getChannels = async (text) => {
     try {
-      // TODO: get channels - fetch
+      const channelsResponse = client.queryChannels({
+        type: "team",
+        name: { $autocomplete: text },
+        members: { $in: [client.userID] },
+      });
+
+      const userResponse = client.queryUsers({
+        id: { $ne: client.userID },
+        name: { $autocomplete: text },
+      });
+
+      const [channels, { users }] = await Promise.all([
+        channelsResponse,
+        userResponse,
+      ]);
+
+      if (channels.length) setTeamChannels(channels);
+      if (users.length) setDirectChannels(users);
     } catch (error) {
       setQuery("");
       console.log(error);
@@ -17,9 +47,14 @@ const ChannelSearch = () => {
   const onSearch = (e) => {
     e.preventDefault();
 
-    setLoad(true);
+    setLoading(true);
     setQuery(e.target.value);
     getChannels(e.target.value);
+  };
+
+  const setChannel = (channel) => {
+    setQuery("");
+    setActiveChannel(channel);
   };
 
   return (
@@ -34,6 +69,16 @@ const ChannelSearch = () => {
           onChange={onSearch}
         />
       </div>
+
+      {query && (
+        <ResultsDropdown
+          teamChannels={teamChannels}
+          directChannels={directChannels}
+          loading={loading}
+          setChannel={setChannel}
+          setQuery={setQuery}
+        />
+      )}
     </div>
   );
 };

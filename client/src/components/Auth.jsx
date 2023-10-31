@@ -31,18 +31,17 @@ const Auth = () => {
   const handleSumbit = async (e) => {
     e.preventDefault();
 
-    const { fullName, email, phoneNumber, avatarUrl, userName, password } =
-      form;
+    const { email, phoneNumber, avatarUrl, userName, password } = form;
 
-    const PORT = 5200;
-    const URL = `http://localhost:${PORT}/auth`;
+    // const PORT = 5200;
+    const URL = `https://chat-server-side-epja.onrender.com/auth`;
 
     const {
-      data: { token, userId, hashedPassword },
+      data: { token, userId, hashedPassword, fullName },
     } = await axios.post(`${URL}/${isSignUp ? "signup" : "login"}`, {
       userName,
       password,
-      fullName,
+      fullName: form.fullName,
       phoneNumber,
       avatarUrl,
       email,

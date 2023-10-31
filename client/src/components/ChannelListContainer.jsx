@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ChannelList, useChatContext } from "stream-chat-react";
 import Cookies from "universal-cookie";
 import { ChannelSearch, ChatList, ChatPreview } from "./";
@@ -8,7 +9,15 @@ import { ImExit } from "react-icons/im";
 
 const cookies = new Cookies();
 
-const ChannelListContainer = ({
+const teamFilter = (channels) => {
+  return channels.filter((channel) => channel.type === "team");
+};
+
+const chatFilter = (channels) => {
+  return channels.filter((channel) => channel.type === "messaging");
+};
+
+const ChannelListContent = ({
   isCreating,
   setIsCreating,
   setCreateType,
@@ -26,6 +35,10 @@ const ChannelListContainer = ({
 
     window.location.reload();
   };
+
+  const { client } = useChatContext();
+
+  const filters = { members: { $in: [client.userID] } };
 
   return (
     <aside className="bg-blue-900 text-white flex flex-col justify-between items-start min-w-[350px] w-[400px] h-screen">
@@ -49,10 +62,10 @@ const ChannelListContainer = ({
 
         <ChannelSearch />
 
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col justify-start w-full">
           <ChannelList
-            filters={{}}
-            channelRenderFilterFn={() => {}}
+            filters={filters}
+            channelRenderFilterFn={teamFilter}
             List={(listProps) => (
               <ChatList
                 {...listProps}
@@ -66,7 +79,6 @@ const ChannelListContainer = ({
             Preview={(previewProps) => (
               <ChatPreview
                 {...previewProps}
-                isCreating={isCreating}
                 setIsCreating={setIsCreating}
                 setCreateType={setCreateType}
                 setIsEditing={setIsEditing}
@@ -76,8 +88,8 @@ const ChannelListContainer = ({
           />
 
           <ChannelList
-            filters={{}}
-            channelRenderFilterFn={() => {}}
+            filters={filters}
+            channelRenderFilterFn={chatFilter}
             List={(listProps) => (
               <ChatList
                 {...listProps}
@@ -91,7 +103,6 @@ const ChannelListContainer = ({
             Preview={(previewProps) => (
               <ChatPreview
                 {...previewProps}
-                isCreating={isCreating}
                 setIsCreating={setIsCreating}
                 setCreateType={setCreateType}
                 setIsEditing={setIsEditing}
@@ -110,6 +121,26 @@ const ChannelListContainer = ({
         </div>
       </div>
     </aside>
+  );
+};
+
+const ChannelListContainer = ({
+  setCreateType,
+  setIsCreating,
+  setIsEditing,
+}) => {
+  // const [toggleContainer, setToggleContainer] = useState(false);
+
+  return (
+    <>
+      <div>
+        <ChannelListContent
+          setIsCreating={setIsCreating}
+          setCreateType={setCreateType}
+          setIsEditing={setIsEditing}
+        />
+      </div>
+    </>
   );
 };
 

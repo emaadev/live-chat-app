@@ -2,7 +2,7 @@ import { Channel, useChatContext, MessageSimple } from "stream-chat-react";
 import { ChannelInner, CreateChannel, EditChannel } from "./";
 
 // TODO: Apply different styles
-// import "./ChannelContainer.css"
+// import "./ChannelContainer.css";
 
 const ChannelContainer = ({
   isCreating,
@@ -23,7 +23,7 @@ const ChannelContainer = ({
 
   if (isEditing) {
     return (
-      <div>
+      <div className="flex w-full">
         <EditChannel setIsEditing={setIsEditing} />
       </div>
     );
